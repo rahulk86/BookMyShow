@@ -1,0 +1,35 @@
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/bookmyshow
+    username: root
+    password: Rahul@123
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+app:
+  zoneId: Asia/Kolkata
+  auth:
+    jwtCookieName: bezkoder
+    jwtRefreshCookieName: bezkoder-jwt-refresh
+    jwtSecret: ======================BezKoder=Spring===========================
+    jwtExpirationMs: 8640000
+    jwtRefreshExpirationMs: 86400000
+  cors:
+    allowCredentials: true
+    allowedOrigins:
+      - http://localhost:3000
+      - http://54.253.132.48:3000
+      - http://192.168.29.228:3000
+      - http://newfeedrecatclone.s3-website-us-east-1.amazonaws.com
+    allowedMethods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+    allowedHeaders:
+      - "*"
