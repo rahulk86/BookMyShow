@@ -52,6 +52,7 @@ public class MovieServiceImpl implements MovieService {
                 .stream()
                 .map(screen -> TheaterDto
                     .builder()
+                    .id(screen.getTheater().getId())
                     .name(screen.getTheater().getName())
                     .shows(showDtos(screen.getShows()))
                     .build()
@@ -93,6 +94,7 @@ public class MovieServiceImpl implements MovieService {
                 .stream()
                 .map(show -> ShowDto
                     .builder()
+                    .id(show.getId())
                     .showTypes(getSeatAvailability(show.getShowSeats()))
                     .startTime(show.getStartTime())
                     .build()

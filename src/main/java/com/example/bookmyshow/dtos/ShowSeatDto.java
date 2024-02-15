@@ -4,13 +4,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-
 @Getter
 @Setter
 @Builder
-public class TheaterDto {
+public class ShowSeatDto {
     private Long id;
-    private String name;
-    private List<ShowDto> shows;
+    private int row;
+    private int col;
+    private String status;
 }

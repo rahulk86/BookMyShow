@@ -11,6 +11,7 @@ import java.util.List;
 @Setter
 @Builder
 public class ShowDto {
+    private Long id;
     private LocalDateTime startTime;
     private List<ShowTypeDto> showTypes;
 }

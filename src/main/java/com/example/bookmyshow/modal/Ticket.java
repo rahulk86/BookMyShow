@@ -10,15 +10,12 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "tickets")
-public class Ticket extends AuditorEntity<User>{
+public class Ticket extends AuditorEntity<User> implements Taxable{
     @ManyToOne
     private User user;
+    private String ticketId;
     @OneToMany
     private List<ShowSeat> seats;
-    private Double amount;
-    @Enumerated(EnumType.STRING)
-    private PaymentMode paymentMode;
-    @Enumerated(EnumType.STRING)
-    private PaymentStatus paymentStatus;
-    private String referenceNumber;
+    private Double baseAmount;
+    private Double gstPercentage;
 }
