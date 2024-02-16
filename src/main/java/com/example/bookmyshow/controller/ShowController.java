@@ -17,10 +17,10 @@ import java.util.stream.Collectors;
 public class ShowController {
     @Autowired
     private ShowService showService;
-    @GetMapping("/getShowSeat")
-    public ResponseEntity<?> getShowSeat(@RequestBody ShowDto showDto){
+    @GetMapping("/getShowSeat/{userId}")
+    public ResponseEntity<?> getShowSeat(@PathVariable Long userId,@RequestBody ShowDto showDto){
         try {
-            List<ShowSeatDto> showSeats = showService.getShowSeats(showDto.getId());
+            List<ShowSeatDto> showSeats = showService.getShowSeats(userId,showDto.getId());
             return ResponseEntity.ok(showSeats);
         }
         catch (Exception exception){

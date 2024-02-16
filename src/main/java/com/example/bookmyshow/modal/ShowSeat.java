@@ -12,6 +12,8 @@ import lombok.Setter;
 @Table(name = "showSeats")
 public class ShowSeat extends AuditorEntity<User>{
      @ManyToOne
+     private User user;
+     @ManyToOne
      private Seat seat;
      @ManyToOne
      private Show show;

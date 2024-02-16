@@ -31,7 +31,9 @@ public class ShowServiceImpl implements ShowService {
     @Autowired
     private TicketRepository ticketRepository;
     @Override
-    public List<ShowSeatDto> getShowSeats(Long showId) throws ShowNotFound {
+    public List<ShowSeatDto> getShowSeats(Long userId,Long showId) throws ShowNotFound {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        User user = optionalUser.orElse(null);
         Optional<Show> optionalShow = showRepository.findById(showId);
         if(optionalShow.isEmpty()){
           throw new ShowNotFound(showId);
@@ -44,10 +46,19 @@ public class ShowServiceImpl implements ShowService {
                                         .id(showSeat.getId())
                                         .col(showSeat.getSeat().getSeatCol())
                                         .row(showSeat.getSeat().getSeatRow())
-                                        .status(showSeat.getStatus().name())
+                                        .status(getShowSeatStatus(user,showSeat))
                                         .build()
                     )
                     .collect(Collectors.toList());
+    }
+
+    private String getShowSeatStatus(User user,ShowSeat seat){
+        if((seat.getUser()!=null && seat.getUser().equals(user)
+            && seat.getStatus().equals(ShowSeatStatus.RESERVED))
+        || seat.getStatus().equals(ShowSeatStatus.AVAILABLE)){
+           return ShowSeatStatus.AVAILABLE.name();
+        }
+        return ShowSeatStatus.NOT_AVAILABLE.name();
     }
 
     @Override
@@ -57,7 +68,7 @@ public class ShowServiceImpl implements ShowService {
         if(optionalUser.isEmpty()){
             throw new UnAuthorizeException(userId);
         }
-
+        User user = optionalUser.get();
         List<ShowSeat> seats = showSeats
                                     .stream()
                                     .map(seatId -> {
@@ -65,10 +76,15 @@ public class ShowServiceImpl implements ShowService {
                                         if (showSeat.isEmpty()) {
                                             throw new ShowSeatNotFound(seatId);
                                         }
-                                        if (!showSeat.get().getStatus().equals(ShowSeatStatus.AVAILABLE)) {
-                                            throw new SeatAreNotAvailable();
+                                        ShowSeat seat = showSeat.get();
+                                        if ((user == seat.getUser()
+                                            && showSeat.get().getStatus().equals(ShowSeatStatus.RESERVED))
+                                            || showSeat.get().getStatus().equals(ShowSeatStatus.AVAILABLE)) {
+                                            seat.setUser(user);
+                                            seat.setStatus(ShowSeatStatus.RESERVED);
+                                            return showSeatRepository.save(seat);
                                         }
-                                        return showSeat.get();
+                                        throw new SeatAreNotAvailable();
                                     })
                                     .collect(Collectors.toList());
         Ticket ticket = new Ticket();
@@ -76,7 +92,7 @@ public class ShowServiceImpl implements ShowService {
         ticket.setBaseAmount(98.00);
         ticket.setGstPercentage(18.0);
         ticket.setSeats(seats);
-        ticket.setUser(optionalUser.get());
+        ticket.setUser(user);
         Ticket saveTicket = ticketRepository.save(ticket);
         return TicketDto
                 .builder()
@@ -91,7 +107,9 @@ public class ShowServiceImpl implements ShowService {
                                 .status(showSeat.getStatus().name())
                                 .row(showSeat.getSeat().getSeatRow())
                                 .col(showSeat.getSeat().getSeatCol())
-                                .build()).collect(Collectors.toList()))
+                                .build())
+                            .collect(Collectors.toList())
+                           )
                 .build();
     }
 

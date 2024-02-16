@@ -16,7 +16,7 @@ public class BookMyShowApplication {
 
     public static void main(String[] args) {
         ApplicationContext run = SpringApplication.run(BookMyShowApplication.class, args);
-//        runForTest(run);
+        runForTest(run);
 
     }
     private static void runForTest(ApplicationContext run){
