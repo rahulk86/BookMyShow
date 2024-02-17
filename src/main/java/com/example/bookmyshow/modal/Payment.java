@@ -1,6 +1,7 @@
 package com.example.bookmyshow.modal;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,9 +11,12 @@ import lombok.Setter;
 @Table(name = "payment")
 public class Payment <T extends Taxable> extends AuditorEntity<User> {
 
+    @Setter(value = AccessLevel.NONE)
     @ManyToOne(targetEntity = Taxable.class)
     private T taxable;
-
+    public Payment(T taxable){
+        this.taxable = taxable;
+    }
     private double taxAmount;
 
     private double totalAmount;

@@ -1,18 +1,15 @@
 package com.example.bookmyshow.service.Impl;
 
+import com.example.bookmyshow.adapters.PaymentGatewayAdapter;
+import com.example.bookmyshow.dtos.PaymentDetails;
 import com.example.bookmyshow.dtos.ShowSeatDto;
 import com.example.bookmyshow.dtos.TicketDto;
-import com.example.bookmyshow.exceptions.SeatAreNotAvailable;
-import com.example.bookmyshow.exceptions.ShowNotFound;
-import com.example.bookmyshow.exceptions.ShowSeatNotFound;
-import com.example.bookmyshow.exceptions.UnAuthorizeException;
+import com.example.bookmyshow.exceptions.*;
 import com.example.bookmyshow.modal.*;
-import com.example.bookmyshow.repository.ShowRepository;
-import com.example.bookmyshow.repository.ShowSeatRepository;
-import com.example.bookmyshow.repository.TicketRepository;
-import com.example.bookmyshow.repository.UserRepository;
+import com.example.bookmyshow.repository.*;
 import com.example.bookmyshow.service.ShowService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,6 +27,10 @@ public class ShowServiceImpl implements ShowService {
     private UserRepository userRepository;
     @Autowired
     private TicketRepository ticketRepository;
+    @Autowired
+    private PaymentGatewayAdapter<Ticket> paymentGatewayAdapter;
+    @Autowired
+    private PaymentRepository<Ticket> paymentRepository;
     @Override
     public List<ShowSeatDto> getShowSeats(Long userId,Long showId) throws ShowNotFound {
         Optional<User> optionalUser = userRepository.findById(userId);
@@ -46,10 +47,22 @@ public class ShowServiceImpl implements ShowService {
                                         .id(showSeat.getId())
                                         .col(showSeat.getSeat().getSeatCol())
                                         .row(showSeat.getSeat().getSeatRow())
+                                        .price(showSeat.getSeat().getSeatType().getPrice())
+                                        .type(showSeat.getSeat().getSeatType().name())
                                         .status(getShowSeatStatus(user,showSeat))
                                         .build()
                     )
                     .collect(Collectors.toList());
+    }
+
+    @Scheduled(fixedRate = 60000)
+    public void updateTicketStatus() {
+        List<ShowSeat> reservedTickets = showSeatRepository.findByStatus(ShowSeatStatus.RESERVED);
+
+        for (ShowSeat ticket : reservedTickets) {
+            ticket.setStatus(ShowSeatStatus.AVAILABLE);
+        }
+        showSeatRepository.saveAll(reservedTickets);
     }
 
     private String getShowSeatStatus(User user,ShowSeat seat){
@@ -106,10 +119,44 @@ public class ShowServiceImpl implements ShowService {
                                 .id(showSeat.getId())
                                 .status(showSeat.getStatus().name())
                                 .row(showSeat.getSeat().getSeatRow())
+                                .price(showSeat.getSeat().getSeatType().getPrice())
+                                .type(showSeat.getSeat().getSeatType().name())
                                 .col(showSeat.getSeat().getSeatCol())
                                 .build())
                             .collect(Collectors.toList())
                            )
+                .build();
+    }
+
+    @Override
+    public PaymentDetails makePayment(String ticketId) throws TicketNotFoundException {
+        Optional<Ticket> optionalTicket = ticketRepository.findByTicketId(ticketId);
+        if(optionalTicket.isEmpty()){
+          throw new TicketNotFoundException(ticketId);
+        }
+        Payment<Ticket> payment = paymentGatewayAdapter.makePayment(optionalTicket.get());
+        payment.setPaymentMode(PaymentMode.CASH);
+        if(payment.getPaymentStatus().equals(PaymentStatus.SUCCESS)){
+            payment.getTaxable()
+                    .getSeats()
+                    .forEach(showSeat -> {
+                        if(!showSeat.getStatus().equals(ShowSeatStatus.RESERVED)){
+                            throw new ShowSeatNotFound(showSeat.getId());
+                        }
+                        showSeat.setStatus(ShowSeatStatus.BOOKED);
+                        showSeatRepository.save(showSeat);
+                    });
+        }
+        Payment<Ticket> ticketPayment = paymentRepository.save(payment);
+        return PaymentDetails
+                .builder()
+                .paymentMode(ticketPayment.getPaymentMode().name())
+                .baseAmount(ticketPayment.getTaxable().getBaseAmount())
+                .paymentStatus(ticketPayment.getPaymentStatus().name())
+                .taxAmount(ticketPayment.getTaxAmount())
+                .gstPercentage(ticketPayment.getTaxable().getGstPercentage())
+                .referenceNumber(ticketPayment.getReferenceNumber())
+                .totalAmount(ticketPayment.getTotalAmount())
                 .build();
     }
 

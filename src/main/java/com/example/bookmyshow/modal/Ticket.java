@@ -14,6 +14,14 @@ public class Ticket extends Taxable{
     @ManyToOne
     private User user;
     private String ticketId;
-    @OneToMany
+    @ManyToMany
     private List<ShowSeat> seats;
+    @Override
+    public Double getPrice() {
+        return seats.stream()
+                    .map(showSeat -> showSeat.getSeat().getSeatType().getPrice())
+                    .reduce(Double::sum)
+                    .get();
+    }
+
 }

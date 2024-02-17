@@ -13,4 +13,13 @@ import lombok.Setter;
 public abstract class Taxable extends AuditorEntity<User>{
     private Double baseAmount;
     private Double gstPercentage;
+    public Double getTotalAmount(){
+        return baseAmount + getTaxAmount()+getPrice();
+    }
+
+    public abstract Double getPrice() ;
+
+    public Double getTaxAmount(){
+        return baseAmount*(gstPercentage/100.0);
+    }
 }

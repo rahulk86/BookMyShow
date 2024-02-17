@@ -1,5 +1,6 @@
 package com.example.bookmyshow.controller;
 
+import com.example.bookmyshow.dtos.PaymentDetails;
 import com.example.bookmyshow.dtos.ShowDto;
 import com.example.bookmyshow.dtos.ShowSeatDto;
 import com.example.bookmyshow.dtos.TicketDto;
@@ -45,4 +46,16 @@ public class ShowController {
                     .body(exception.getClass().getSimpleName()+" :: "+exception.getMessage());
         }
     }
-}
+    @PostMapping("/makePayment/{ticketId}")
+    public ResponseEntity<?> makePayment(@PathVariable String ticketId) {
+        try{
+            PaymentDetails paymentDetails = showService.makePayment(ticketId);
+            return ResponseEntity.ok(paymentDetails);
+        }catch(Exception exception){
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(exception.getClass().getSimpleName()+" :: "+exception.getMessage());
+        }
+    }
+
+    }

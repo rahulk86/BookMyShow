@@ -11,5 +11,7 @@ public class ShowSeatDto {
     private Long id;
     private int row;
     private int col;
+    private double price;
+    private String type;
     private String status;
 }
