@@ -4,16 +4,18 @@ import com.example.bookmyshow.modal.*;
 import com.example.bookmyshow.repository.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.ApplicationContext;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @SpringBootApplication
-@EnableJpaAuditing
-@EnableScheduling
+@EntityScan(basePackages = {"com.auth.modal","com.example.bookmyshow.modal"})
+@EnableJpaRepositories(basePackages = {"com.auth.repository","com.example.bookmyshow.repository"})
+@ComponentScan(basePackages = {"com.auth","com.example.bookmyshow"})
 public class BookMyShowApplication {
 
     public static void main(String[] args) {

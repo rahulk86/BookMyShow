@@ -1,6 +1,10 @@
 package com.example.bookmyshow.modal;
 
-import jakarta.persistence.*;
+import com.auth.modal.user.User;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 

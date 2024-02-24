@@ -1,12 +1,17 @@
 package com.example.bookmyshow.service.Impl;
 
+import com.auth.modal.user.User;
+import com.auth.repository.user.UserRepository;
 import com.example.bookmyshow.adapters.PaymentGatewayAdapter;
 import com.example.bookmyshow.dtos.PaymentDetails;
 import com.example.bookmyshow.dtos.ShowSeatDto;
 import com.example.bookmyshow.dtos.TicketDto;
 import com.example.bookmyshow.exceptions.*;
 import com.example.bookmyshow.modal.*;
-import com.example.bookmyshow.repository.*;
+import com.example.bookmyshow.repository.PaymentRepository;
+import com.example.bookmyshow.repository.ShowRepository;
+import com.example.bookmyshow.repository.ShowSeatRepository;
+import com.example.bookmyshow.repository.TicketRepository;
 import com.example.bookmyshow.service.ShowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;

@@ -1,5 +1,6 @@
 package com.example.bookmyshow.modal;
 
+import com.auth.modal.BaseModel;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
@@ -10,7 +11,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class Taxable extends AuditorEntity<User>{
+public abstract class Taxable extends BaseModel {
     private Double baseAmount;
     private Double gstPercentage;
     public Double getTotalAmount(){

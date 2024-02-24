@@ -1,5 +1,6 @@
 package com.example.bookmyshow.modal;
 
+import com.auth.modal.BaseModel;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -11,7 +12,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "theaters")
-public class Theater extends AuditorEntity<User>{
+public class Theater extends BaseModel {
     private String name;
     private String address;
     private double latitude;
